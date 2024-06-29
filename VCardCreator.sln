@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.11.35005.142
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VCardCreator", "VCardCreator\VCardCreator.csproj", "{CED21CE6-B388-41B7-953A-D4C0AACF38AE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CED21CE6-B388-41B7-953A-D4C0AACF38AE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CED21CE6-B388-41B7-953A-D4C0AACF38AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CED21CE6-B388-41B7-953A-D4C0AACF38AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CED21CE6-B388-41B7-953A-D4C0AACF38AE}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {64CA418D-1EE0-4B13-99F7-5F5D4DF3E117}
+	EndGlobalSection
+EndGlobal
