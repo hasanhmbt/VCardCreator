@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json.Linq;
 using System.Runtime.InteropServices.JavaScript;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using VCardCreator.Models;
 using static System.Net.WebRequestMethods;
 
@@ -18,35 +19,29 @@ class Program
             Console.WriteLine("Enter a valid number.");
             return;
         }
-        else
+        try
         {
-            try
+            var vCards = await VCardCreate.GenerateRandomVCards(vCardCount);
+            foreach (var vCard in vCards)
             {
-                for (int i = 0; i < vCardCount; i++)
-                {
-
-                    var vCard = await VCardCreate.GenerateRandomVCard();
-                    VCardCreate.SaveCardToFile(vCard);
-                    Console.WriteLine(vCard.Id);
-                }
+                VCardCreate.SaveCardToFile(vCard);
+                Console.WriteLine($"vCard with ID: {vCard.Id} created.");
             }
-            catch (IOException ioEx)
-            {
-                Console.WriteLine($"Error saving VCard to file: {ioEx.Message}");
-            }
-            catch (Exception ex)
-            {
-
-                Console.WriteLine($"Error occured:{ex}");
-            }
-
+        }
+        catch (IOException ioEx)
+        {
+            Console.WriteLine($"Error saving VCard to file: {ioEx.Message}");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error occurred: {ex}");
         }
 
-        Console.Write("All vCards have been created.\n\n\n");
-
-
-
+        Console.WriteLine("All vCards have been created.");
     }
+
+
+
 }
 
 
@@ -59,40 +54,40 @@ public class VCardCreate
     private static readonly HttpClient client = new HttpClient();
 
 
-    public static async Task<VCard> GenerateRandomVCard()
+    public static async Task<List<VCard>> GenerateRandomVCards(int number)
     {
-
-        string apiUrl = $"https://randomuser.me/api/";
+        string apiUrl = $"https://randomuser.me/api/?results={number}";
 
         try
         {
-
-
-
             HttpResponseMessage response = await client.GetAsync(apiUrl);
             response.EnsureSuccessStatusCode();
             string responseBody = await response.Content.ReadAsStringAsync();
 
+            var rootObject = JsonSerializer.Deserialize<Rootobject>(responseBody);
 
-            var randomUser = JsonDocument.Parse(responseBody).RootElement.GetProperty("results")[0];
-
-
-
-
-
-            return new VCard
+            if (rootObject?.results == null || rootObject.results.Length == 0)
             {
+                throw new Exception("Invalid API response");
+            }
 
-                Id = randomUser.GetProperty("login").GetProperty("uuid").GetString(),
-                Firstname = randomUser.GetProperty("name").GetProperty("first").GetString(),
-                Surname = randomUser.GetProperty("name").GetProperty("last").GetString(),
-                Email = randomUser.GetProperty("email").GetString(),
-                Phone = randomUser.GetProperty("phone").GetString(),
-                Country = randomUser.GetProperty("location").GetProperty("country").GetString(),
-                City = randomUser.GetProperty("location").GetProperty("city").GetString(),
+            var vCards = new List<VCard>();
+            foreach (var result in rootObject.results)
+            {
+                var vCard = new VCard
+                {
+                    Id = result.login.uuid,
+                    Firstname = result.name.first,
+                    Surname = result.name.last,
+                    Email = result.email,
+                    Phone = result.phone,
+                    Country = result.location.country,
+                    City = result.location.city
+                };
+                vCards.Add(vCard);
+            }
 
-
-            };
+            return vCards;
         }
         catch (HttpRequestException ex)
         {
@@ -100,7 +95,7 @@ public class VCardCreate
         }
         catch (Exception ex)
         {
-            throw new Exception($"An unexpected error occurred while generating the VCard. Error details: {ex.Message}");
+            throw new Exception($"An unexpected error occurred while generating the vCards. Error details: {ex.Message}");
         }
     }
 
