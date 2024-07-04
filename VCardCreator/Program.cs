@@ -24,6 +24,7 @@ class Program
             var vCards = await VCardCreate.GenerateRandomVCards(vCardCount);
             foreach (var vCard in vCards)
             {
+                // Saving each vCard to a file and print its ID
                 VCardCreate.SaveCardToFile(vCard);
                 Console.WriteLine($"vCard with ID: {vCard.Id} created.");
             }
@@ -60,6 +61,7 @@ public class VCardCreate
 
         try
         {
+            // Getting data from API
             HttpResponseMessage response = await client.GetAsync(apiUrl);
             response.EnsureSuccessStatusCode();
             string responseBody = await response.Content.ReadAsStringAsync();
@@ -105,10 +107,15 @@ public class VCardCreate
     {
         try
         {
-            string filePath = Path.Combine(Directory.GetCurrentDirectory(), "vCards");
+            // Define the file path and create the directory if it doesn't exist
+
+            string path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+            string filePath = Path.Combine(path, "vCards");
             Directory.CreateDirectory(filePath);
 
-            string fileName = Path.Combine(filePath, $"{vCard.Firstname}-{vCard.Surname}-{Guid.NewGuid()}.vcf");
+
+            // Generate  unique VCard name 
+            string fileName = Path.Combine(filePath, $"{vCard.Firstname}-{vCard.Surname}-{vCard.Id}.vcf"); 
             string vCardContent = vCard.ToVCardFormat();
 
             System.IO.File.WriteAllText(fileName, vCardContent);
